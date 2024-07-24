@@ -65,6 +65,7 @@ class CycloneDXCommand:
             '--exclude-dev', action='store_true',
             help=exclude_dev_help, dest='exclude_dev'
         )
+        parser.add_argument('--set-version', action='store', help='Set the version of the package in BOM', dest='pkg_version')
         build_help = ("Given a build policy, return an ordered list of packages that would be built"
                       " from sources during the install command")
 
@@ -136,6 +137,8 @@ class CycloneDXCommand:
                 for dependency in node.dependencies:
                     if str(dependency.dst.id) in node.graph_lock_node.requires:
                         to_visit.add(dependency.dst)
+        if self._arguments.pkg_version:
+            bom['metadata']['component']['version'] = self._arguments.pkg_version
 
         for node in deps_graph.nodes:
             if node.ref is None:
