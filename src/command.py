@@ -66,6 +66,7 @@ class CycloneDXCommand:
             help=exclude_dev_help, dest='exclude_dev'
         )
         parser.add_argument('--set-version', action='store', help='Set the version of the package in BOM', dest='pkg_version')
+        parser.add_argument('--set-package-name', action='store', help='Set the name of the package in BOM', dest='pkg_name')
         build_help = ("Given a build policy, return an ordered list of packages that would be built"
                       " from sources during the install command")
 
@@ -139,11 +140,11 @@ class CycloneDXCommand:
                         to_visit.add(dependency.dst)
         if self._arguments.pkg_version:
             bom['metadata']['component']['version'] = self._arguments.pkg_version
-
+       
         for node in deps_graph.nodes:
             if node.ref is None:
                 # top level component
-                bom['metadata']['component']['name'] = os.path.basename(os.path.dirname(node.path))
+                bom['metadata']['component']['name'] = self._arguments.pkg_name if self._arguments.pkg_name else os.path.basename(os.path.dirname(node.path))
                 bom['metadata']['component']['bom-ref'] = bom['metadata']['component']['name'] + '@' + bom['metadata']['component']['version']
                 dependencies = {
                     'ref': bom['metadata']['component']['bom-ref'],
